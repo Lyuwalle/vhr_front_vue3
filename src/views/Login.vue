@@ -20,13 +20,14 @@
         <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="请输入密码"></el-input>
+        <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="请输入密码"
+                  @keydown.enter.native="submitLogin"></el-input>
       </el-form-item>
 
       <!--      check box-->
-      <el-checkbox class="loginRemember" v-model="checked" disabled>记住我</el-checkbox>
+      <el-checkbox class="loginRemember" v-model="checked">记住我</el-checkbox>
       <!--      登录按钮-->
-      <el-button type="primary" style="width:100%" @click="submitLogin" plain>登录</el-button>
+      <el-button class="submit" type="submit" @click="submitLogin">登录</el-button>
     </el-form>
   </div>
 </template>
@@ -62,12 +63,14 @@ export default {
           this.loading = true;
           postKeyValueRequest('/doLogin', this.loginForm).then(resp => {
             if (resp) {
-              alert(JSON.stringify(resp))
+              /*alert(JSON.stringify(resp))*/
+              /*登录成功之后把用户的信息保存在sessionStorage里面*/
               window.sessionStorage.setItem("user", JSON.stringify(resp.object))
               /*这个this.$router指的是main.js里面的router，，更像是router/index.js里面的router？*/
               /*登录的页面的跳转使用replace，而不是push，登录之后不能返回*/
-              this.$router.replace('/home')
-
+              /*如果有重定向，获取重定向后的地址*/
+              let path = this.$route.query.redirect;
+              this.$router.replace((path == '/' || path == undefined) ? '/home' : path);
             }
           })
           this.loading = false;
@@ -83,7 +86,7 @@ export default {
 </script>
 
 <style scoped>
-.loginTitle{
+.loginTitle {
   margin: 15px auto 20px auto;
   text-align: center;
   color: #021a32;
@@ -92,15 +95,27 @@ export default {
   border-radius: 15px;
   background-clip: padding-box;
   margin: 180px auto;
-  width: 350px;
+  width: 400px;
   padding: 15px 35px 15px 35px;
   background: #eaeaea;
   border: 1px solid #eaeaea;
   /*表示阴影效果*/
   box-shadow: 0 0 25px #cac6c6;
 }
+.loginContainer .submit {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 .outerContainer {
-  background: #ffffff;
+  background: #000000;
+  /*background-image: url("../assets/world-map.png");
+  background-size: 100% 100%;*/
 }
 .loginRemember {
   text-align: left;

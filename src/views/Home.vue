@@ -5,7 +5,7 @@
       <el-header class="homeHeader">
 
         <div class="title" >
-          <a style="text-decoration-line: none; color: #9a6759">Homebrew Management System</a>
+          <a style="text-decoration-line: none; color: #100101; font-family: 'Apple Braille',serif">Homebrew Management System</a>
         </div>
         <div>
           <el-dropdown class="userInfo" @command="handleCommand">
@@ -37,14 +37,40 @@
                   <span>{{item.name}}</span>
                 </template>
                 <!--              index表示点击菜单项要跳转的路径-->
-                <el-menu-item :index="child.path" v-for="(child, indexj) in item.children" :key="indexj">{{child.name}}</el-menu-item>
+              <!--这里的index表示要跳转的页面，点击一级菜单之后不需要跳转到响应的页面，只需要把子菜单展开就可以了，而点击二级菜单之后要跳转到相应的页面-->
+              <!--                          因此二级菜单的index是数据库对应的path-->
+                <el-menu-item :index="child.path" v-for="(child, indexj) in item.children" :key="indexj">
+                  <i style="color: #180c0c; margin-right: 5px" :class="child.iconCls"></i>
+                  {{child.name}}
+                </el-menu-item>
             </el-submenu>
           </el-menu>
         </el-aside>
-<!--        容器布局：main-->
+<!--        容器布局：main, 点击菜单的vue组件时，就会在el-main区域里面显示-->
         <el-main>
+<!--          加入面包屑-->
+<!--          不是首页才展示面包屑-->
+          <el-breadcrumb separator-class="el-icon-arrow-right" v-if="this.$router.currentRoute.path != '/home'">
+            <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>{{this.$router.currentRoute.name}}</el-breadcrumb-item>
+          </el-breadcrumb>
+<!--          定义首页-->
+          <div class="homeWelcome" v-if="this.$router.currentRoute.path=='/home'">
+            Welcome to coca-cola vhr!
+          </div>
+          <div class="EmailMe" v-if="this.$router.currentRoute.path=='/home'">
+            Email lyuwalle@gmail.com
+          </div>
+          <!-- github和weibo标签             target="_blank"表示点击图标会跳转到一个新打开的页面-->
+          <div class="GitHub" v-if="this.$router.currentRoute.path=='/home'">
+            <a href="https://github.com/Lyuwalle" style="color: black" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>&nbsp
+            <a href="https://m.weibo.cn/profile/5661604657" style="color: #ea1a1a" target="_blank"><i class="fa fa-weibo" aria-hidden="true"></i></a>
+          </div>
+
           <router-view/>
+
         </el-main>
+
       </el-container>
     </el-container>
   </div>
@@ -60,6 +86,7 @@ import {getRequest} from "@/utils/api";
         user: JSON.parse(window.sessionStorage.getItem("user"))
       }
     },
+    /*计算属性，路径数组放在store里面*/
     computed: {
       routes() {
         return this.$store.state.routes;
@@ -124,5 +151,22 @@ import {getRequest} from "@/utils/api";
   height: 48px;
   border-radius: 24px;
   margin-left: 8px;
+}
+.GitHub{
+  font-size: large;
+  text-align: center;
+  padding-top: 0px;
+}
+.homeWelcome {
+  text-align: center;
+  font-size: 60px;
+  font-family: fantasy,serif;
+  color: #033232;
+  padding-top: 80px;
+}
+.EmailMe{
+  text-align: center;
+  font-family: "MV Boli";
+  padding-top: 350px;
 }
 </style>

@@ -21,8 +21,17 @@ router.beforeEach((to, from, next) => {
   if (to.path == '/') {
     next();
   } else {
-    initMenu(router, store);
-    next();
+    /*已经登录*/
+    if (window.sessionStorage.getItem("user")) {
+      initMenu(router, store);
+      next();
+    } else {
+      /*没有登录直接登录*/
+      /*next('/');*/
+      /*登录之后跳转到之前输入的url*//*还要修改login.vue里面登录成功之后的页面*/
+      next('/?redirect='+to.path);
+    }
+
   }
 })
 
