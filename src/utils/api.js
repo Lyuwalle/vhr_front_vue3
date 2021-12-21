@@ -26,7 +26,7 @@ axios.interceptors.response.use(success => {
     if (error.response.data.message) {
       Message.error({message: error.response.data.message})
     } else {
-      Message.error('未知错误！可能后端没有启动')
+      Message.error('未知错误！后端没有启动或方法出错')
     }
   }
   return;
