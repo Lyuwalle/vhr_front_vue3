@@ -173,7 +173,7 @@ export default {
         this.multipleSelection.forEach(item => {
           ids += 'ids=' + item.id + '&';
         })
-        this.deleteRequest("/system/basic/pos/" + ids).then(resp => {
+        deleteRequest("/system/basic/pos/" + ids).then(resp => {
           if (resp) {
             this.initPositions();
           }

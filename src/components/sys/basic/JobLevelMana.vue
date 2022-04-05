@@ -21,7 +21,7 @@
         border
         size="small"
         @selection-change="handleSelectionChange"
-        style="width: 80%">
+        style="width: 60%">
       <el-table-column
           type="selection"
           width="55">
@@ -38,14 +38,17 @@
       </el-table-column>
       <el-table-column
           prop="titleLevel"
-          label="职称级别">
+          label="职称级别"
+          width="150">
       </el-table-column>
       <el-table-column
           prop="createDate"
-          label="创建时间">
+          label="创建时间"
+          width="200">
       </el-table-column>
       <el-table-column
-          label="是否启用">
+          label="是否启用"
+          width="200">
         <template slot-scope="scope">
           <el-tag type="success" v-if="scope.row.enabled">已启用</el-tag>
           <el-tag type="danger" v-else>未启用</el-tag>
