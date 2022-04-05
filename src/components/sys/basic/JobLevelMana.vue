@@ -70,7 +70,7 @@
   <el-dialog
       title="修改职称"
       :visible.sync="dialogVisible"
-      width="30%">
+      width="20%">
     <div>
       <table>
         <tr>
