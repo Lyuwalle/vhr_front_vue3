@@ -67,7 +67,8 @@
             <a href="https://m.weibo.cn/profile/5661604657" style="color: #ea1a1a" target="_blank"><i class="fa fa-weibo" aria-hidden="true"></i></a>
           </div>
 
-          <router-view/>
+<!--用于统一调整router-view，比如所有页面的间距-->
+          <router-view class="homeRouterView"/>
 
         </el-main>
 
@@ -124,6 +125,9 @@ import {getRequest} from "@/utils/api";
 </script>
 
 <style>
+.homeRouterView {
+  margin-top: 0px;
+}
 .homeHeader {
   background-color: #90b7de;
   display: flex;
