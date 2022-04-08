@@ -107,6 +107,7 @@ export default {
       }
       this.pname = '';
     },
+    /*这个方法的作用是在前端实时展示添加完部门的部门树，没有这个方法必须要刷新一下才能显示出来*/
     addDepToDeps(deps, dep) {
       for (let i = 0; i < deps.length; i++) {
         let d = deps[i];
@@ -125,7 +126,7 @@ export default {
       postRequest("/system/basic/department/", this.dep).then(resp => {
         if (resp) {
           /*动态地往tree中添加一个数据，添加完整个tree不用收起来*/
-          this.addDepToDeps(this.deps, resp.obj);
+          this.addDepToDeps(this.deps, resp.object);
           this.dialogVisible = false;
 
           //初始化变量，使对话框input框里面数据为空
@@ -133,8 +134,8 @@ export default {
         }
       })
     },
-    removeDepFromDeps(p,deps, id) {
-      for(let i=0;i<deps.length;i++){
+    removeDepFromDeps(p, deps, id) {
+      for(let i=0; i < deps.length; i++){
         let d = deps[i];
         if (d.id == id) {
           deps.splice(i, 1);
@@ -142,7 +143,7 @@ export default {
             p.parent = false;
           }
           return;
-        }else{
+        } else {
           this.removeDepFromDeps(d,d.children, id);
         }
       }
@@ -156,9 +157,9 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteRequest("/system/basic/department/"+data.id).then(resp=>{
+          deleteRequest("/system/basic/department/"+ data.id).then(resp=>{
             if (resp) {
-              this.removeDepFromDeps(null,this.deps,data.id);
+              this.removeDepFromDeps(null, this.deps, data.id);
             }
           })
         }).catch(() => {

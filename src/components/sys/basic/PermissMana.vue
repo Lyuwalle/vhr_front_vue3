@@ -14,12 +14,14 @@
     </div>
 <!--显示区域-->
     <div class="permissManaShow">
-      <!--                   accordion表示手风琴效果,activeName表示是哪一个id展开，选项卡的id就是name-->
-<!--      @change="change"表示当前面板改变时触发-->
+      <!--  collapse折叠面板       accordion表示手风琴效果,activeName表示是哪一个id展开，选项卡的id就是name-->
+<!--      @change="change"表示当前面板改变时触发, 点击折叠面板的事件，这里为调用后端返回的菜单树，以及角色id对应的哪些菜单被选中-->
+<!--      点击collapse-item，会把rid传到change里面-->
       <el-collapse v-model="activeName"
                    accordion
                    @change="change">
-        <el-collapse-item :title="r.nameZh" :name="r.id" v-for="(r,index) in roles" :key="index">
+        <el-collapse-item :title="r.nameZh" :name="r.id" v-for="(r, index) in roles" :key="index">
+<!--          card卡片-->
           <el-card class="box-card">
             <div slot="header" class="clearfix">
 <!--              可访问的资源表示这个角色可以访问的菜单，一级菜单和二级菜单放在了tree控件了里面-->
@@ -31,6 +33,7 @@
             <div>
 <!--              树形控件-->
 <!--              ”所有“是菜单表中的第一个，id=1，所有的一级菜单的parentId就是1-->
+<!--              allmenus是后端返回的数组，一共有三级菜单，所有——》员工资料——》基本资料-->
 <!--              :default-checked-keys表示选择框selectedMenus数组中包含的项前面选中-->
 <!--              node-key表示菜单项的id，作为预选中的参数-->
 <!--              ref="tree"表示通过这个名字就可以查找到这个tree,这里是一个tree数组，有多少个角色就有多少个tree-->
@@ -45,7 +48,7 @@
               </el-tree>
               <div style="display: flex;justify-content: flex-end">
                 <el-button @click="cancelUpdate" style="margin-top: 8px">取消修改</el-button>
-                <el-button type="primary" style="margin-top: 8px" @click="doUpdate(r.id,index)">确认修改</el-button>
+                <el-button type="primary" style="margin-top: 8px" @click="doUpdate(r.id, index)">确认修改</el-button>
               </div>
             </div>
           </el-card>
@@ -152,7 +155,7 @@ export default {
       })
     },
     initSelectedMenus(rid){
-      this.getRequest("/system/basic/permiss/mids/" + rid).then(resp => {
+      getRequest("/system/basic/permiss/mids/" + rid).then(resp => {
         if (resp) {
           this.selectedMenus = resp;
         }
