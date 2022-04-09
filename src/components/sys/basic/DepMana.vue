@@ -125,6 +125,7 @@ export default {
     doAddDep() {
       postRequest("/system/basic/department/", this.dep).then(resp => {
         if (resp) {
+          console.log(resp);
           /*动态地往tree中添加一个数据，添加完整个tree不用收起来*/
           this.addDepToDeps(this.deps, resp.object);
           this.dialogVisible = false;
