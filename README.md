@@ -1,6 +1,8 @@
 # vhr_front_vue3
-原作：https://github.com/lenve/vhr
 微人事项目前端
+
+原作：https://github.com/lenve/vhr
+
 ## Project setup
 ```
 npm install
