@@ -9,6 +9,7 @@
 
 <!--    :expand-on-click-node="false"表示在添加部门或者删除部门的时候不会展开tree-->
     <el-tree
+              v-loading="loading"
               style="margin-top: 10px"
               :data="deps"
               :props="defaultProps"
@@ -86,7 +87,8 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'name'
-      }
+      },
+      loading: true
     }
   },
   mounted() {
@@ -184,6 +186,7 @@ export default {
     initDeps(){
       getRequest("/system/basic/department/").then(resp => {
         if(resp){
+          this.loading = false;
           this.deps = resp;
         }
       })
