@@ -9,7 +9,7 @@
         <el-input placeholder="请输入员工名进行搜索，可以直接回车搜索..." prefix-icon="el-icon-search"
                   clearable
                   @clear="initEmps"
-                  style="width: 350px;margin-right: 10px;margin-top: 10px"
+                  style="width: 350px; margin-right: 10px;margin-top: 10px"
                   v-model="keyword"
                   :disabled="showAdvanceSearchView"
                   @keydown.enter.native="initEmps">
@@ -64,7 +64,7 @@
       <el-table-column prop="wedlock" label="婚姻情况" width="100"></el-table-column>
       <el-table-column prop="nation.name" label="民族" width="50"></el-table-column>
       <el-table-column prop="nativePlace" label="籍贯" width="80"></el-table-column>
-      <el-table-column prop="politicStatus.name" label="政治面貌" ></el-table-column>
+      <el-table-column prop="politicsStatus.name" label="政治面貌" ></el-table-column>
       <el-table-column prop="email" label="电子邮件" align="left" width="180"></el-table-column>
       <el-table-column prop="phone" label="电话号码" align="left" width="115"></el-table-column>
       <el-table-column prop="address" label="地址"  align="left" width="220"></el-table-column>
@@ -84,11 +84,22 @@
           <el-tag>{{scope.row.contractTerm}}</el-tag>年
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="100"></el-table-column>
+<!--      操作按钮-->
+      <el-table-column
+          fixed="right"
+          width="200"
+          label="操作">
+        <template slot-scope="scope">
+          <el-button  style="padding: 3px" size="mini" @click="showEditEmpView(scope.row)">编辑</el-button>
+
+          <el-button style="padding: 3px" size="mini" type="primary">查看高级资料</el-button>
+          <el-button  style="padding: 3px" size="mini" type="danger" @click="deleteEmp(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
 
     </el-table>
 <!--    分页栏-->
-    <div style="display: flex; justify-content: flex-end">
+    <div style="display: flex; justify-content: flex-end; margin-top: 10px">
       <!--        @current-change表示page改变时会触发-->
       <!--        @size-change表示pageSize改变时会触发-->
       <el-pagination
@@ -99,7 +110,7 @@
           :total="total" >
       </el-pagination>
     </div>
-<!--    编辑对话框-->
+<!--    编辑对话框, 和添加员工的对话框共用-->
     <el-dialog
         :title="title"
         :visible.sync="dialogVisible"
@@ -208,16 +219,19 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="所属部门:" prop="departmentId">
+<!--                <el-input size="mini" style="width: 150px" prefix-icon="el-icon-edit"
+                          v-model="emp.departmentId" placeholder="请输入部门id"></el-input>-->
                 <el-popover
                     placement="right"
                     title="请选择部门"
                     width="200"
                     trigger="manual"
                     v-model="popVisible">
+<!--                  handleNodeClick表示点击部门树的某一项触发的动作-->
                   <el-tree default-expand-all @node-click="handleNodeClick" :data="allDeps" :props="defaultProps"></el-tree>
                   <div slot="reference"
-                       style="width: 130px;display: inline-flex;font-size: 13px;border: 1px solid #dedede;height: 26px;border-radius: 5px;cursor: pointer;align-items: center;padding-left: 8px;box-sizing: border-box;margin-left: 3px"
-                       @click="showDepView2">{{inputDepName}}
+                       style="width: 130px; display: inline-flex; font-size: 13px; border: 1px solid #dedede; height: 26px;border-radius: 5px;cursor: pointer;align-items: center;padding-left: 8px;box-sizing: border-box;margin-left: 3px"
+                       @click="showDepView">{{inputDepName}}
                   </div>
                 </el-popover>
               </el-form-item>
@@ -356,7 +370,7 @@
 </template>
 
 <script>
-import {getRequest} from "@/utils/api";
+import {deleteRequest, getRequest, postRequest, putRequest} from "@/utils/api";
 export default {
   name: "EmpBasic",
   data() {
@@ -451,8 +465,41 @@ export default {
   mounted() {
     this.initEmps();
     this.initData();
+    this.initPositions();
   },
   methods: {
+    initPositions() {
+      getRequest('/employee/basic/positions').then(resp => {
+        if (resp) {
+          this.positions = resp
+        }
+      })
+    },
+    showEditEmpView(data) {
+      this.initPositions();
+      this.title = '编辑员工信息';
+      this.emp = data;
+      this.inputDepName = data.department.name;
+      this.dialogVisible = true;
+    },
+    deleteEmp(data) {
+      this.$confirm('此操作将永久删除【' + data.name + '】, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRequest("/employee/basic/" + data.id).then(resp => {
+          if (resp) {
+            this.initEmps();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
     initEmps(type) {
       this.loading = true;
       let url = '/employee/basic/allEmp/?page=' + this.page + '&pageSize=' + this.pageSize;
@@ -460,7 +507,7 @@ export default {
       if (type && type == 'advanced') {
 
       } else {
-        url += "&name=" + this.keyword;
+        url += "&keyword=" + this.keyword;
       }
       getRequest(url).then(resp => {
         this.loading = false;
@@ -509,12 +556,14 @@ export default {
       if (!window.sessionStorage.getItem("deps")) {
         getRequest('/employee/basic/deps').then(resp => {
           if (resp) {
+            console.log(resp)
             this.allDeps = resp;
             window.sessionStorage.setItem("deps", JSON.stringify(resp));
           }
         })
       } else {
         this.allDeps = JSON.parse(window.sessionStorage.getItem("deps"));
+        console.log(this.allDeps)
       }
       /*职位*/
       if (!window.sessionStorage.getItem("positions")) {
@@ -579,7 +628,7 @@ export default {
     getMaxWordID() {
       getRequest("/employee/basic/maxEmpId").then(resp => {
         if (resp) {
-          this.emp.workId = resp.object;
+          this.emp.workId = resp;
         }
       })
     },
@@ -588,7 +637,7 @@ export default {
         this.$refs['empForm'].validate(valid => {
           if (valid) {
             /*由于编辑和添加员工是同一个页面，因此当emp有id时是更新员工信息，否则就是添加员工信息。*/
-            this.putRequest("/employee/basic/", this.emp).then(resp => {
+            putRequest("/employee/basic/", this.emp).then(resp => {
               if (resp) {
                 this.dialogVisible = false;
                 this.initEmps();
@@ -599,7 +648,7 @@ export default {
       } else {
         this.$refs['empForm'].validate(valid => {
           if (valid) {
-            this.postRequest("/employee/basic/", this.emp).then(resp => {
+            postRequest("/employee/basic/", this.emp).then(resp => {
               if (resp) {
                 this.dialogVisible = false;
                 this.initEmps();
@@ -609,13 +658,15 @@ export default {
         });
       }
     },
+    /*点击树的一项时触发的动作，
+    * inputDepName指的是展示的名称*/
     handleNodeClick(data) {
       this.inputDepName = data.name;
       this.emp.departmentId = data.id;
       this.popVisible = !this.popVisible
     },
-    showDepView2() {
-      this.popVisible2 = !this.popVisible2
+    showDepView() {
+      this.popVisible = !this.popVisible
     },
   }
 }
