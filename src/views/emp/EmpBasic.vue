@@ -14,11 +14,13 @@
                   :disabled="showAdvanceSearchView"
                   @keydown.enter.native="initEmps">
         </el-input>
-        <el-button icon="el-icon-search" type="primary" @click="initEmps" >搜索</el-button>
+        <el-button icon="el-icon-search" type="primary" @click="initEmps" :disabled="showAdvanceSearchView">
+         搜索
+        </el-button>
         <el-button type="primary" @click="showAdvanceSearchView = !showAdvanceSearchView">
-          <i :class="showAdvanceSearchView ? 'fa fa-angle-double-up':'fa fa-angle-double-down'"
-             aria-hidden="true"></i>
-          高级搜索
+            <i :class="showAdvanceSearchView ? 'fa fa-angle-double-up':'fa fa-angle-double-down'"
+               aria-hidden="true"></i>
+               高级搜索
         </el-button>
       </div>
       <div style="margin-top: 10px">
@@ -39,7 +41,108 @@
       </div>
     </div>
   </div>
-  <div></div>
+
+
+  <!--    高级搜索-->
+  <!--    vue组件中使用<transition></transition>标签过渡动画-->
+  <transition name="slide-fade">
+    <div v-show="showAdvanceSearchView"
+         style="border: 1px solid #409eff;border-radius: 5px;box-sizing: border-box;padding: 5px;margin: 10px 0px;">
+      <el-row>
+        <el-col :span="5">
+          政治面貌:
+          <el-select v-model="searchValue.politicId" placeholder="政治面貌" size="mini"
+                     style="width: 130px;">
+            <el-option
+                v-for="item in politicStatus"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4">
+          民族:
+          <el-select v-model="searchValue.nationId" placeholder="民族" size="mini"
+                     style="width: 130px;">
+            <el-option
+                v-for="item in nations"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4">
+          职位:
+          <el-select v-model="searchValue.posId" placeholder="职位" size="mini" style="width: 130px;">
+            <el-option
+                v-for="item in positions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4">
+          职称:
+          <el-select v-model="searchValue.jobLevelId" placeholder="职称" size="mini"
+                     style="width: 130px;">
+            <el-option
+                v-for="item in jobLevels"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="7">
+          聘用形式:
+          <el-radio-group v-model="searchValue.engageForm">
+            <el-radio label="劳动合同">劳动合同</el-radio>
+            <el-radio label="劳务合同">劳务合同</el-radio>
+          </el-radio-group>
+        </el-col>
+      </el-row>
+
+      <el-row style="margin-top: 10px">
+        <el-col :span="5">
+          所属部门:
+          <el-popover
+              placement="right"
+              title="请选择部门"
+              width="200"
+              trigger="manual"
+              v-model="popVisible2">
+            <el-tree default-expand-all :data="allDeps" :props="defaultProps"
+                     @node-click="searchViewHandleNodeClick"></el-tree>
+            <div slot="reference"
+                 style="width: 130px;display: inline-flex;font-size: 13px;border: 1px solid #dedede;height: 26px;border-radius: 5px;cursor: pointer;align-items: center;padding-left: 8px;box-sizing: border-box;margin-left: 3px"
+                 @click="showDepView2">{{inputDepName}}
+            </div>
+          </el-popover>
+        </el-col>
+        <el-col :span="10">
+          入职日期:
+          <el-date-picker
+              v-model="searchValue.beginDateScope"
+              type="daterange"
+              size="mini"
+              unlink-panels
+              value-format="yyyy-MM-dd"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+          </el-date-picker>
+        </el-col>
+        <el-col :span="5" :offset="4">
+          <el-button size="mini">取消</el-button>
+          <el-button size="mini" icon="el-icon-search" type="primary" @click="initEmps('advanced')">搜索</el-button>
+        </el-col>
+      </el-row>
+    </div>
+  </transition>
+
 <!--  表格+分页栏+编辑对话框-->
   <div style="margin-top: 10px">
 <!--    表格-->
@@ -378,7 +481,15 @@ export default {
       page : 1,
       pageSize : 10,
       total : 0,
-
+      searchValue: {
+        politicId: null,
+        nationId: null,
+        jobLevelId: null,
+        posId: null,
+        engageForm: null,
+        departmentId: null,
+        beginDateScope: null
+      },
       emps : [],
       emp: {
         name: "lyuwalle",
@@ -431,6 +542,11 @@ export default {
         name: [{required: true, message: '请输入用户名', trigger: 'blur'}],
         gender: [{required: true, message: '请输入性别', trigger: 'blur'}],
         birthday: [{required: true, message: '请输入出生日期', trigger: 'blur'}],
+        idCard: [{required: true, message: '请输入身份证号码', trigger: 'blur'}, {
+          pattern: /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/,
+          message: '身份证号码格式不正确',
+          trigger: 'blur'
+        }],
         wedlock: [{required: true, message: '请输入婚姻状况', trigger: 'blur'}],
         nationId: [{required: true, message: '请输入您组', trigger: 'blur'}],
         nativePlace: [{required: true, message: '请输入籍贯', trigger: 'blur'}],
@@ -468,6 +584,14 @@ export default {
     this.initPositions();
   },
   methods: {
+    showDepView2() {
+      this.popVisible2 = !this.popVisible2
+    },
+    searchViewHandleNodeClick(data) {
+      this.inputDepName = data.name;
+      this.searchValue.departmentId = data.id;
+      this.popVisible2 = !this.popVisible2
+    },
     initPositions() {
       getRequest('/employee/basic/positions').then(resp => {
         if (resp) {
@@ -505,10 +629,33 @@ export default {
       let url = '/employee/basic/allEmp/?page=' + this.page + '&pageSize=' + this.pageSize;
       /*高级搜索*/
       if (type && type == 'advanced') {
-
+          if (this.searchValue.politicId) {
+            url += '&politicId=' + this.searchValue.politicId;
+          }
+          if (this.searchValue.nationId) {
+            url += '&nationId=' + this.searchValue.nationId;
+          }
+          if (this.searchValue.jobLevelId) {
+            url += '&jobLevelId=' + this.searchValue.jobLevelId;
+          }
+          if (this.searchValue.posId) {
+            url += '&posId=' + this.searchValue.posId;
+          }
+          if (this.searchValue.engageForm) {
+            url += '&engageForm=' + this.searchValue.engageForm;
+          }
+          if (this.searchValue.departmentId) {
+            url += '&departmentId=' + this.searchValue.departmentId;
+          }
+          if (this.searchValue.beginDateScope) {
+            url += '&beginDateScope=' + this.searchValue.beginDateScope;
+          }
+          /*普通搜索，加关键字就可以了*/
       } else {
-        url += "&keyword=" + this.keyword;
+        /*这个name属性是employee里面的属性*/
+        url += "&name=" + this.keyword;
       }
+      console.log(url);
       getRequest(url).then(resp => {
         this.loading = false;
         if (resp) {
@@ -523,7 +670,6 @@ export default {
       this.pageSize = currentSize;
       this.initEmps();
     },
-    //todo 要加高级搜索标识？
     pageChange(currentPage) {
       this.page = currentPage;
       this.initEmps();
