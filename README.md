@@ -1,4 +1,7 @@
 # vhr_front_vue3
+微人事项目前端
+
+原作：https://github.com/lenve/vhr
 
 ## Project setup
 ```
