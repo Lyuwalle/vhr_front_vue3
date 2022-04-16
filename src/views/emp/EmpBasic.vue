@@ -32,8 +32,8 @@
             批量导入
           </el-button>
         </el-upload>
-        <el-button type="success" icon="el-icon-download">
-          导出数据
+        <el-button type="success" icon="el-icon-download" @click="exportData">
+          全部导出
         </el-button>
         <el-button type="primary" icon="el-icon-plus" @click="showAddEmpView">
           添加员工
@@ -136,7 +136,7 @@
           </el-date-picker>
         </el-col>
         <el-col :span="5" :offset="4">
-          <el-button size="mini">取消</el-button>
+          <el-button size="mini" @click="cancelAdvancedSearch">取消</el-button>
           <el-button size="mini" icon="el-icon-search" type="primary" @click="initEmps('advanced')">搜索</el-button>
         </el-col>
       </el-row>
@@ -584,6 +584,12 @@ export default {
     this.initPositions();
   },
   methods: {
+    exportData() {
+      window.open('/employee/basic/export', '_parent');
+    },
+    cancelAdvancedSearch() {
+      this.showAdvanceSearchView = !this.showAdvanceSearchView
+    },
     showDepView2() {
       this.popVisible2 = !this.popVisible2
     },
