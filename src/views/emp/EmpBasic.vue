@@ -24,12 +24,17 @@
         </el-button>
       </div>
       <div style="margin-top: 10px">
+<!--        action表示上传的地址-->
         <el-upload
-            :show-file-list="false"
+            :show-file-list="true"
+            :before-upload="beforeUpload"
+            :on-success="onSuccess"
+            :on-error="onError"
+            :disabled="importDataDisabled"
             style="display: inline-flex; margin-right: 8px"
             action="/employee/basic/import">
-          <el-button  type="success" >
-            批量导入
+          <el-button :disabled="importDataDisabled" type="success" :icon="importButtonIcon">
+            {{importButtonText}}
           </el-button>
         </el-upload>
         <el-button type="success" icon="el-icon-download" @click="exportData">
@@ -478,6 +483,9 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      importButtonText:'导入数据',
+      importButtonIcon:'el-icon-upload2',
+      importDataDisabled: false,
       page : 1,
       pageSize : 10,
       total : 0,
@@ -584,6 +592,24 @@ export default {
     this.initPositions();
   },
   methods: {
+    onError(err, file, fileList) {
+      this.importButtonText = '导入数据';
+      this.importButtonIcon = 'el-icon-upload2';
+      this.importDataDisabled = false;
+    },
+    onSuccess(response, file, fileList) {
+      this.importButtonText = '导入数据';
+      this.importButtonIcon = 'el-icon-upload2';
+      this.importDataDisabled = false;
+      this.initEmps();
+    },
+    beforeUpload() {
+      this.importButtonText = '正在导入';
+      /*正在上传的图标变成一个旋转的图标*/
+      this.importButtonIcon = 'el-icon-loading';
+      /*表示上传文件之后，这个图标就变成灰色不可点击*/
+      this.importDataDisabled = true;
+    },
     exportData() {
       window.open('/employee/basic/export', '_parent');
     },
@@ -825,5 +851,21 @@ export default {
 </script>
 
 <style scoped>
+/*上面transition标签对应的样式*/
+/* 可以设置不同的进入和离开动画 */
+/* 设置持续时间和动画函数 */
+.slide-fade-enter-active {
+  transition: all .8s ease;
+}
 
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for below version 2.1.8 */
+{
+  transform: translateX(10px);
+  opacity: 0;
+}
 </style>
