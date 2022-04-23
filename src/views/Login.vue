@@ -23,7 +23,13 @@
         <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="请输入密码"
                   @keydown.enter.native="submitLogin"></el-input>
       </el-form-item>
-
+      <!--    验证码-->
+      <el-form-item prop="code">
+        <el-input type="text" v-model="loginForm.code" auto-complete="off" placeholder="点击图片更换验证码"
+                  @keydown.enter.native="submitLogin" style="width: 250px"></el-input>
+        <!--      图片-->
+        <img :src="verifyCodeUrl" @click="updateVerifyCode" alt="">
+      </el-form-item>
       <!--      check box-->
       <el-checkbox class="loginRemember" v-model="checked">记住我</el-checkbox>
       <!--      登录按钮-->
@@ -41,6 +47,7 @@ export default {
   data() {
     return {
       /*loading初始值设置为false，登录时设置为true，成功之后再设置为false*/
+      verifyCodeUrl:'/verifyCode?time=' + new Date(),
       loading: false,
       checked: true,
       rules: {
@@ -55,6 +62,9 @@ export default {
     }
   },
   methods: {
+    updateVerifyCode(){
+      this.verifyCodeUrl='/verifyCode?time='+new Date()
+    },
     /*处理登录事件*/
     submitLogin() {
       this.$refs.loginFormCheck.validate((valid) => {
